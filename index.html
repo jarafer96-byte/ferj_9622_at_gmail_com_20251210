@@ -677,18 +677,80 @@ if (window.email) {
   document.getElementById('volverArriba').onclick = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
-
+function renderizarProductos(productos) {
+  console.log("🎨 Renderizando productos:", productos.length);
+  
+  const cont = document.getElementById("productos");
+  if (!cont) {
+    console.warn("⚠️ No se encontró el contenedor #productos");
+    return;
+  }
+  
+  cont.innerHTML = ""; // Limpiar contenedor
+  
+  productos.forEach(p => {
+    const card = renderProducto(p);
+    cont.appendChild(card);
+    
+    // Animación
+    setTimeout(() => {
+      card.classList.remove("fade-reorder");
+      card.classList.add("show");
+    }, 50);
+  });
+  
+  console.log("✅ " + productos.length + " productos renderizados");
+}
 document.getElementById("tallesProd").addEventListener("input", function() {
   const talles = this.value.split(",").map(t => t.trim()).filter(Boolean);
   const container = document.getElementById("stockPorTalleContainer");
   const simpleContainer = document.getElementById("stockSimple");
   
+  console.log("⌨️ Talles ingresados:", talles);
+  
   if (talles.length > 0) {
     container.style.display = "block";
     simpleContainer.style.display = "none";
+    
+    // 🔥 NUEVO: Limpiar automáticamente el stock por talle
+    const stockPorTalleInput = document.getElementById("stockPorTalle");
+    if (stockPorTalleInput && stockPorTalleInput.value) {
+      try {
+        // Parsear stock existente
+        const stockExistente = {};
+        stockPorTalleInput.value.split(",").forEach(item => {
+          const parts = item.split(":").map(s => s.trim());
+          if (parts.length >= 2) {
+            const talle = parts[0];
+            const stock = parseInt(parts[1]) || 0;
+            stockExistente[talle] = stock;
+          }
+        });
+        
+        // Crear nuevo stock solo con talles actuales
+        const nuevoStock = talles.map(talle => {
+          if (stockExistente[talle] !== undefined) {
+            return `${talle}:${stockExistente[talle]}`;
+          } else {
+            return `${talle}:0`; // Nuevo talle, stock en 0
+          }
+        }).join(", ");
+        
+        stockPorTalleInput.value = nuevoStock;
+        console.log("🔄 Stock por talle actualizado:", nuevoStock);
+        
+      } catch (error) {
+        console.error("❌ Error procesando stock:", error);
+        // Si hay error, crear stock desde cero
+        const nuevoStock = talles.map(t => `${t}:0`).join(", ");
+        stockPorTalleInput.value = nuevoStock;
+      }
+    }
+    
   } else {
     container.style.display = "none";
     simpleContainer.style.display = "block";
+    console.log("📭 Sin talles, mostrando stock simple");
   }
 });
 
