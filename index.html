@@ -762,9 +762,14 @@ function cargarProductoCompletoParaEditar(id_base) {
     alert("❌ No se encontró el producto para editar");
   }
 }
-// CORREGIDA - Esta función sí filtra el stock por talle correctamente
 function cargarProductoEnFormulario(producto) {
   console.log("📝 Cargando producto para editar:", producto.nombre);
+  console.log("🔍 Datos del producto recibidos:", {
+    talles: producto.talles,
+    stock_por_talle: producto.stock_por_talle,
+    tiene_talles_array: Array.isArray(producto.talles),
+    tiene_stock_por_talle: !!producto.stock_por_talle
+  });
   
   // Mostrar formulario admin
   const adminCard = document.getElementById("adminCard");
@@ -780,39 +785,65 @@ function cargarProductoEnFormulario(producto) {
   document.getElementById("grupoProd").value = producto.grupo || "";
   document.getElementById("subgrupoProd").value = producto.subgrupo || "";
   
-  // 1. Obtener talles del producto
+  // 1. Obtener talles del producto - CON MÁS DEBUG
   let tallesArray = [];
+  console.log("🔍 Analizando talles del producto...");
+  
   if (Array.isArray(producto.talles)) {
     tallesArray = producto.talles;
+    console.log("✅ Talles como array:", tallesArray);
     document.getElementById("tallesProd").value = producto.talles.join(", ");
   } else if (typeof producto.talles === 'string') {
     tallesArray = producto.talles.split(",").map(t => t.trim()).filter(Boolean);
+    console.log("✅ Talles como string convertido:", tallesArray);
     document.getElementById("tallesProd").value = producto.talles;
   } else {
+    console.log("⚠️ No se encontraron talles o formato inválido:", producto.talles);
     document.getElementById("tallesProd").value = "";
   }
   
+  console.log("📋 Talles finales:", tallesArray);
+  
   // 2. Determinar qué campo de stock mostrar
   if (tallesArray.length > 0) {
-    // Producto CON talles
+    console.log("🔄 Producto CON talles, mostrando stock por talle");
     document.getElementById("stockPorTalleContainer").style.display = "block";
     document.getElementById("stockSimple").style.display = "none";
     
-    // 🔥 CORRECCIÓN CLAVE: Filtrar stock por talle para solo incluir talles actuales
+    // 🔥 CORRECCIÓN MEJORADA con más logs
     let stockPorTalleStr = "";
     
     if (producto.stock_por_talle && Object.keys(producto.stock_por_talle).length > 0) {
       const stockPorTalle = producto.stock_por_talle;
+      console.log("📊 Stock por talle original:", stockPorTalle);
+      
       const stockFiltrado = {};
+      let tallesFiltrados = 0;
+      let tallesIgnorados = [];
       
       // Solo incluir stock para los talles que existen
       tallesArray.forEach(talle => {
         if (stockPorTalle[talle] !== undefined) {
           stockFiltrado[talle] = stockPorTalle[talle];
+          tallesFiltrados++;
+          console.log(`✅ Talle "${talle}" encontrado en stock: ${stockPorTalle[talle]}`);
         } else {
           stockFiltrado[talle] = 0; // Talle nuevo, stock en 0
+          console.log(`⚠️ Talle "${talle}" NO encontrado en stock, asignando 0`);
         }
       });
+      
+      // Verificar si hay talles en stock que ya no están en tallesArray
+      Object.keys(stockPorTalle).forEach(talle => {
+        if (!tallesArray.includes(talle) && talle !== "unico") {
+          tallesIgnorados.push(`${talle}:${stockPorTalle[talle]}`);
+          console.log(`🗑️ Talle "${talle}" será ignorado porque no está en tallesArray`);
+        }
+      });
+      
+      if (tallesIgnorados.length > 0) {
+        console.log("📌 Talles ignorados del stock:", tallesIgnorados.join(", "));
+      }
       
       // Crear string para el input
       stockPorTalleStr = Object.entries(stockFiltrado)
@@ -825,12 +856,13 @@ function cargarProductoEnFormulario(producto) {
     } else {
       // Si no hay stock definido, crear uno inicial
       stockPorTalleStr = tallesArray.map(t => `${t}:0`).join(", ");
+      console.log("➕ Creando stock inicial:", stockPorTalleStr);
     }
     
     document.getElementById("stockPorTalle").value = stockPorTalleStr;
     
   } else {
-    // Producto SIN talles
+    console.log("🔄 Producto SIN talles, mostrando stock simple");
     document.getElementById("stockPorTalleContainer").style.display = "none";
     document.getElementById("stockSimple").style.display = "block";
     
@@ -838,8 +870,12 @@ function cargarProductoEnFormulario(producto) {
     let stockGeneral = 0;
     if (producto.stock_por_talle && producto.stock_por_talle["unico"] !== undefined) {
       stockGeneral = producto.stock_por_talle["unico"];
+      console.log("📊 Stock general (unico):", stockGeneral);
     } else if (producto.stock) {
       stockGeneral = producto.stock;
+      console.log("📊 Stock general (stock):", stockGeneral);
+    } else {
+      console.log("📊 Sin stock definido, usando 0");
     }
     
     document.getElementById("stockGeneral").value = stockGeneral;
@@ -851,13 +887,16 @@ function cargarProductoEnFormulario(producto) {
     previewFoto.src = producto.imagen_url;
     previewFoto.classList.remove("d-none");
     document.getElementById("btnQuitarFoto").classList.remove("d-none");
+    console.log("🖼️ Imagen cargada:", producto.imagen_url);
   } else {
     document.getElementById("previewFoto").classList.add("d-none");
     document.getElementById("btnQuitarFoto").classList.add("d-none");
+    console.log("🖼️ Sin imagen");
   }
   
   // 4. Guardar ID del producto que estamos editando
   window.productoEditandoId = producto.id_base;
+  console.log("🔑 ID del producto en edición:", window.productoEditandoId);
   
   // 5. Scroll al formulario
   adminCard.scrollIntoView({ behavior: 'smooth' });
