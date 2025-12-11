@@ -1302,7 +1302,67 @@ function toggleModoAdmin(activo) {
     }
   });
 }
+    
+function guardarTalles(id) {
+  const input = document.getElementById("input_talles_" + id);
+  if (!input) {
+    console.warn("❌ No se encontró el input de talles:", "input_talles_" + id);
+    return;
+  }
 
+  // Parsear "S, M, L" → ["S","M","L"]
+  const nuevosTalles = input.value.split(",").map(t => t.trim()).filter(t => t);
+  console.log("📡 Enviando talles al backend:", { id, talles: nuevosTalles, email });
+
+  fetch("https://mpagina.onrender.com/actualizar-talles", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, talles: nuevosTalles, email }) // 👈 email incluido
+  })
+    .then(res => {
+      console.log("📡 Respuesta recibida del backend, status:", res.status);
+      return res.json();
+    })
+    .then(data => {
+      console.log("📩 Respuesta backend guardarTalles:", data);
+
+      if (data.status === "ok") {
+        // Regenerar el select con las nuevas opciones
+        const nuevoSelect = document.createElement("select");
+        nuevoSelect.id = "talle_" + id;
+        nuevoSelect.className = "form-select form-select-sm w-auto d-inline-block";
+
+        if (nuevosTalles.length > 0) {
+          nuevosTalles.forEach(t => {
+            const opt = document.createElement("option");
+            opt.value = t;
+            opt.textContent = t;
+            nuevoSelect.appendChild(opt);
+          });
+        } else {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "Sin talles";
+          nuevoSelect.appendChild(opt);
+        }
+
+        input.replaceWith(nuevoSelect);
+        nuevoSelect.classList.add("text-success");
+        setTimeout(() => nuevoSelect.classList.remove("text-success"), 1000);
+
+        if (typeof mostrarAvisoTalle === "function") mostrarAvisoTalle();
+        console.log("✅ Talles actualizados y DOM refrescado para producto:", id);
+      } else {
+        console.error("❌ Error al actualizar talles:", data.message || data);
+        alert("❌ No se pudo actualizar los talles en el servidor");
+      }
+    })
+    .catch(err => {
+      console.error("💥 Error de conexión al guardar los talles:", err);
+      alert("❌ Error de conexión al guardar los talles");
+    });
+}
+    
 function editarVariantes(idProducto) {
   // Crear modal para gestionar variantes
   const modalHTML = `
