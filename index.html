@@ -1603,21 +1603,7 @@ document.getElementById("inputFoto").addEventListener("change", async (e) => {
     alert("❌ No se pudo optimizar la imagen");
   }
 });
-
-document.getElementById("tallesProd").addEventListener("input", function() {
-  const talles = this.value.split(",").map(t => t.trim()).filter(Boolean);
-  const container = document.getElementById("stockPorTalleContainer");
-  const simpleContainer = document.getElementById("stockSimple");
-  
-  if (talles.length > 0) {
-    container.style.display = "block";
-    simpleContainer.style.display = "none";
-  } else {
-    container.style.display = "none";
-    simpleContainer.style.display = "block";
-  }
-});
-    
+   
 document.getElementById("btnConfirmarProd").addEventListener("click", async () => {
   const email = "ferj.9622@gmail.com";
   if (!email) {
