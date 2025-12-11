@@ -1083,7 +1083,28 @@ function mostrarFormulario() {
         }
     }, 100);
 }
+    
+function editarTalles(id) {
+  const select = document.getElementById("talle_" + id);
+  if (!select) return;
 
+  const opciones = Array.from(select.options).map(opt => opt.value).filter(Boolean);
+  const valorActual = opciones.join(", ");
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = valorActual;
+  input.className = "form-control form-control-sm d-inline-block";
+  input.style.width = "200px";
+  input.id = "input_talles_" + id;
+
+  input.onblur = () => guardarTalles(id);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") input.blur(); });
+
+  select.replaceWith(input);
+  input.focus();
+}
+    
 // 2. Ocultar formulario de datos del cliente (NUEVA)
 function ocultarFormulario() {
     const datosCliente = document.getElementById('datosCliente');
