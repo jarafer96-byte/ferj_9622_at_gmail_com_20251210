@@ -3310,15 +3310,9 @@ function renderProducto(p) {
   
   const onclickAgregar = `agregarAlCarritoDOM('${nombreEscapado}', 'precio_${p.id_base}', 'cantidad_${p.id_base}', '${p.id_base}', '${grupoEscapado}', '${subgrupoEscapado}')`;
   
-  // 🔥 NUEVO: Mostrar descripción en la card (tanto admin como público)
+  // Mostrar descripción en la card
   const mostrarDescripcion = p.descripcion ? 
     `<p class="card-text text-muted small mb-2">${p.descripcion}</p>` : 
-    '';
-  
-  // 🔥 NUEVO: Botón para editar descripción en modo admin
-  const botonEditarDescripcion = window.modoAdmin ? 
-    `<button type="button" class="btn btn-sm btn-outline-secondary ms-2" 
-      onclick="editarDescripcion('${p.id_base}')">📝 Editar descripción</button>` : 
     '';
   
   card.innerHTML = `
@@ -3330,24 +3324,16 @@ function renderProducto(p) {
       <div class="card-body">
         <h5 class="card-title">${p.nombre}</h5>
         
-        <!-- 🔥 NUEVO: Mostrar descripción del producto -->
+        <!-- Descripción del producto -->
         ${mostrarDescripcion}
         
-        <!-- Información de precio con botón de editar -->
+        <!-- Información de precio -->
         <p class="mb-2">
           <strong>Precio:</strong> 
           $<span id="precio_${p.id_base}">${p.precio}</span>
-          ${window.modoAdmin ? `
-            <button type="button" class="btn btn-sm btn-outline-primary ms-2"
-              onclick="editarPrecio('${p.id_base}')">✎ Editar precio</button>
-          ` : ""}
         </p>
         
-        ${tieneStockPorTalle ? `
-          <span class="badge bg-info mb-2"></span>
-        ` : ""}
-        
-        <!-- Selector de talle -->
+        <!-- Selector de talle (SOLO si hay talles) -->
         ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
           <div class="mb-2">
             <label class="form-label mb-1" style="font-size: 14px;"><strong>Talle:</strong></label>
@@ -3356,10 +3342,6 @@ function renderProducto(p) {
               <option value="">Seleccionar talle...</option>
               ${opcionesTalles}
             </select>
-            ${window.modoAdmin ? `
-              <button type="button" class="btn btn-sm btn-outline-primary ms-2 mt-1"
-                onclick="editarTallesYStock('${p.id_base}')">✎ Gestionar talles</button>
-            ` : ""}
           </div>
         ` : ""}
         
@@ -3367,10 +3349,6 @@ function renderProducto(p) {
         <p class="mb-2">
           <strong>Disponible:</strong> 
           <span id="stock_${p.id_base}" class="${claseStock}">${mostrarStock}</span>
-          ${window.modoAdmin && Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
-             <button type="button" class="btn btn-sm btn-outline-primary ms-2"
-              onclick="editarStockTalleActual('${p.id_base}')">✎ Editar stock</button>
-          ` : ""}
         </p>
         
         ${configWhatsApp ? `<a href="${configWhatsApp}" class="btn btn-whatsapp">Contactar por WhatsApp</a>` : ""}
@@ -3389,14 +3367,20 @@ function renderProducto(p) {
           </button>
         </div>
         
+        <!-- 🔥 BOTONES DE ADMIN - SIMPLIFICADO A UN SOLO BOTÓN DE EDICIÓN -->
         ${window.modoAdmin ? `
           <div class="mt-3 d-flex flex-wrap gap-2">
-            <!-- 🔥 NUEVO: Botón para editar TODO el producto (incluye descripción) -->
-            <button type="button" class="btn btn-warning btn-sm btnEditarTodo"
-              onclick="cargarProductoCompletoParaEditar('${p.id_base}')">✏️ Editar todo</button>
+            <!-- ÚNICO BOTÓN PARA EDITAR TODO EL PRODUCTO -->
+            <button type="button" class="btn btn-warning btn-sm"
+              onclick="cargarProductoCompletoParaEditar('${p.id_base}')">
+              ✏️ Editar Producto
+            </button>
             
-            <button type="button" class="btn btn-danger btn-sm btnEliminarCard"
-              onclick="eliminarProducto('${p.id_base}')">🗑️ Eliminar</button>
+            <!-- Botón eliminar -->
+            <button type="button" class="btn btn-danger btn-sm"
+              onclick="eliminarProducto('${p.id_base}')">
+              🗑️ Eliminar
+            </button>
           </div>
         ` : ""}
       </div>
