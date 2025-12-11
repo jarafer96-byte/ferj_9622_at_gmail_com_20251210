@@ -700,6 +700,7 @@ function cargarProductoCompletoParaEditar(id_base) {
     alert("❌ No se encontró el producto para editar");
   }
 }
+// CORREGIDA - Esta función sí filtra el stock por talle correctamente
 function cargarProductoEnFormulario(producto) {
   console.log("📝 Cargando producto para editar:", producto.nombre);
   
@@ -710,7 +711,7 @@ function cargarProductoEnFormulario(producto) {
   // Activar modo edición
   toggleModoEdicion(true);
   
-  // Llenar campos básicos
+  // Llenar campos con datos del producto
   document.getElementById("nombreProd").value = producto.nombre || "";
   document.getElementById("precioProd").value = producto.precio || "";
   document.getElementById("descripcionProd").value = producto.descripcion || "";
