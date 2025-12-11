@@ -679,56 +679,13 @@ if (window.email) {
   };
 
 document.getElementById("tallesProd").addEventListener("input", function() {
-  const tallesInput = this.value;
-  const talles = tallesInput.split(",").map(t => t.trim()).filter(Boolean);
+  const talles = this.value.split(",").map(t => t.trim()).filter(Boolean);
   const container = document.getElementById("stockPorTalleContainer");
   const simpleContainer = document.getElementById("stockSimple");
   
   if (talles.length > 0) {
     container.style.display = "block";
     simpleContainer.style.display = "none";
-    
-    // 🔥 NUEVO: Limpiar stockPorTalle si hay cambios en los talles
-    const stockPorTalleInput = document.getElementById("stockPorTalle");
-    if (stockPorTalleInput.value) {
-      try {
-        const stockActual = stockPorTalleInput.value;
-        const stockObj = {};
-        
-        // Parsear el stock existente
-        stockActual.split(",").forEach(item => {
-          const parts = item.split(":").map(s => s.trim());
-          if (parts.length >= 2) {
-            const talle = parts[0];
-            const stock = parts[1];
-            stockObj[talle] = stock;
-          }
-        });
-        
-        // Crear nuevo string solo con los talles que existen ahora
-        const nuevoStock = talles.map(talle => {
-          if (stockObj[talle] !== undefined) {
-            return `${talle}:${stockObj[talle]}`;
-          } else {
-            return `${talle}:0`; // Nuevo talle, stock en 0
-          }
-        }).join(", ");
-        
-        stockPorTalleInput.value = nuevoStock;
-        console.log("🔄 Stock por talle actualizado:", nuevoStock);
-        
-      } catch (error) {
-        console.warn("⚠️ Error procesando stock por talle:", error);
-        // Si hay error, empezar de cero
-        const nuevoStock = talles.map(t => `${t}:0`).join(", ");
-        stockPorTalleInput.value = nuevoStock;
-      }
-    } else {
-      // Si no hay stock definido, crear uno nuevo
-      const nuevoStock = talles.map(t => `${t}:0`).join(", ");
-      stockPorTalleInput.value = nuevoStock;
-    }
-    
   } else {
     container.style.display = "none";
     simpleContainer.style.display = "block";
