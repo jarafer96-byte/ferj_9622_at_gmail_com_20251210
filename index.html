@@ -903,22 +903,7 @@ function actualizarStockPorTalle(idProducto, talleSeleccionado) {
     agregarBtn.textContent = "Sin stock";
   }
 }
-function renderizarProductos(productos) {
-  const cont = document.getElementById("productos");
-  if (!cont) {
-    console.warn("⚠️ No se encontró el contenedor #productos");
-    return;
-  }
-  
-  cont.innerHTML = ""; // Limpiar contenedor
-  productos.forEach(p => {
-    const card = renderProducto(p);
-    cont.appendChild(card);
-    setTimeout(() => card.classList.remove("fade-reorder"), 50);
-  });
-  
-  console.log("✅ " + productos.length + " productos renderizados");
-}
+
     
 // Cuando se hace click en "Editar" en un producto
 window.cargarProductoEnFormulario = function(producto) {
