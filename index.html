@@ -1637,36 +1637,6 @@ document.getElementById("btnConfirmarProd").addEventListener("click", async () =
     alert("❌ Error al guardar producto: " + err.message);
   }
 });
-
-// Función unificada para actualizar stock
-async function actualizarStockUnificado(productoId, email, tipo, datos) {
-  try {
-    const payload = {
-      email: email,
-      tipo: tipo,
-      ...datos
-    };
-    
-    const response = await fetch(`${URL_BACKEND}/api/producto/${productoId}/stock/actualizar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    const data = await response.json();
-    
-    if (data.status === 'ok') {
-      mostrarAviso(`✅ Stock ${tipo} actualizado`);
-      return data;
-    } else {
-      throw new Error(data.error || 'Error al actualizar stock');
-    }
-  } catch (error) {
-    console.error('❌ Error actualizando stock:', error);
-    mostrarAviso(`❌ ${error.message}`);
-    return null;
-  }
-}
     
 function salirAdmin() {
   console.log("🚪 Saliendo de modo admin, limpiando token...");
