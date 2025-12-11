@@ -710,66 +710,96 @@ function cargarProductoEnFormulario(producto) {
   // Activar modo edición
   toggleModoEdicion(true);
   
-  // Llenar campos
+  // Llenar campos básicos
   document.getElementById("nombreProd").value = producto.nombre || "";
   document.getElementById("precioProd").value = producto.precio || "";
   document.getElementById("descripcionProd").value = producto.descripcion || "";
+  document.getElementById("grupoProd").value = producto.grupo || "";
+  document.getElementById("subgrupoProd").value = producto.subgrupo || "";
   
-  // Talles
+  // 1. Obtener talles del producto
+  let tallesArray = [];
   if (Array.isArray(producto.talles)) {
+    tallesArray = producto.talles;
     document.getElementById("tallesProd").value = producto.talles.join(", ");
   } else if (typeof producto.talles === 'string') {
+    tallesArray = producto.talles.split(",").map(t => t.trim()).filter(Boolean);
     document.getElementById("tallesProd").value = producto.talles;
   } else {
     document.getElementById("tallesProd").value = "";
   }
   
-  // Detectar si hay talles para mostrar campo de stock correspondiente
-  const tallesArray = document.getElementById("tallesProd").value.split(",").map(t => t.trim()).filter(Boolean);
+  // 2. Determinar qué campo de stock mostrar
   if (tallesArray.length > 0) {
+    // Producto CON talles
     document.getElementById("stockPorTalleContainer").style.display = "block";
     document.getElementById("stockSimple").style.display = "none";
-  }
-  
-  // Stock por talle
-  if (producto.stock_por_talle && Object.keys(producto.stock_por_talle).length > 0) {
-    const stockPorTalle = producto.stock_por_talle;
     
-    if (Object.keys(stockPorTalle)[0] === "unico") {
-      // Producto sin talles
-      document.getElementById("stockGeneral").value = stockPorTalle["unico"] || 0;
-      document.getElementById("stockPorTalleContainer").style.display = "none";
-      document.getElementById("stockSimple").style.display = "block";
-    } else {
-      // Producto con talles
-      const stockPorTalleStr = Object.entries(stockPorTalle)
+    // 🔥 CORRECCIÓN CLAVE: Filtrar stock por talle para solo incluir talles actuales
+    let stockPorTalleStr = "";
+    
+    if (producto.stock_por_talle && Object.keys(producto.stock_por_talle).length > 0) {
+      const stockPorTalle = producto.stock_por_talle;
+      const stockFiltrado = {};
+      
+      // Solo incluir stock para los talles que existen
+      tallesArray.forEach(talle => {
+        if (stockPorTalle[talle] !== undefined) {
+          stockFiltrado[talle] = stockPorTalle[talle];
+        } else {
+          stockFiltrado[talle] = 0; // Talle nuevo, stock en 0
+        }
+      });
+      
+      // Crear string para el input
+      stockPorTalleStr = Object.entries(stockFiltrado)
         .map(([talle, stock]) => `${talle}:${stock}`)
         .join(", ");
-      document.getElementById("stockPorTalle").value = stockPorTalleStr;
-      document.getElementById("stockPorTalleContainer").style.display = "block";
-      document.getElementById("stockSimple").style.display = "none";
+      
+      console.log("🔄 Stock por talle filtrado:", stockFiltrado);
+      console.log("📝 String generado:", stockPorTalleStr);
+      
+    } else {
+      // Si no hay stock definido, crear uno inicial
+      stockPorTalleStr = tallesArray.map(t => `${t}:0`).join(", ");
     }
+    
+    document.getElementById("stockPorTalle").value = stockPorTalleStr;
+    
   } else {
-    // Fallback a stock general
-    document.getElementById("stockGeneral").value = producto.stock || 0;
+    // Producto SIN talles
+    document.getElementById("stockPorTalleContainer").style.display = "none";
+    document.getElementById("stockSimple").style.display = "block";
+    
+    // Determinar stock general
+    let stockGeneral = 0;
+    if (producto.stock_por_talle && producto.stock_por_talle["unico"] !== undefined) {
+      stockGeneral = producto.stock_por_talle["unico"];
+    } else if (producto.stock) {
+      stockGeneral = producto.stock;
+    }
+    
+    document.getElementById("stockGeneral").value = stockGeneral;
   }
   
-  document.getElementById("grupoProd").value = producto.grupo || "";
-  document.getElementById("subgrupoProd").value = producto.subgrupo || "";
-  
-  // Imagen
+  // 3. Imagen
   if (producto.imagen_url) {
     const previewFoto = document.getElementById("previewFoto");
     previewFoto.src = producto.imagen_url;
     previewFoto.classList.remove("d-none");
     document.getElementById("btnQuitarFoto").classList.remove("d-none");
+  } else {
+    document.getElementById("previewFoto").classList.add("d-none");
+    document.getElementById("btnQuitarFoto").classList.add("d-none");
   }
   
-  // Guardar ID del producto que estamos editando
+  // 4. Guardar ID del producto que estamos editando
   window.productoEditandoId = producto.id_base;
   
-  // Scroll al formulario
+  // 5. Scroll al formulario
   adminCard.scrollIntoView({ behavior: 'smooth' });
+  
+  console.log("✅ Producto cargado correctamente en formulario");
 }
 function toggleModoEdicion(editando) {
   const btnCancelar = document.getElementById("btnCancelarEdicion");
