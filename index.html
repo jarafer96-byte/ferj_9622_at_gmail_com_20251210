@@ -2058,15 +2058,6 @@ function mostrarAviso(mensaje) {
     aviso.style.display = "none";
   }, 3000);
 }
-    
-function mostrarAvisoPrecio() {
-  const aviso = document.getElementById("avisoPrecio");
-  if (!aviso) return;
-  aviso.style.display = "block";
-  setTimeout(() => {
-    aviso.style.display = "none";
-  }, 2000);
-}
 
 function eliminarDelCarrito(id_base, talle, event) {
   if (event?.stopPropagation) event.stopPropagation();
