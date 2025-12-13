@@ -765,7 +765,18 @@ document.getElementById("tallesProd").addEventListener("input", function() {
     console.log("📭 Sin talles, mostrando stock simple");
   }
 });
+// Mostrar/ocultar botón login al final de página
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('loginToggleBtn');
+  const isBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+  btn.style.display = isBottom ? 'block' : 'none';
+});
 
+// Alternar formulario flotante
+document.getElementById('loginToggleBtn').onclick = () => {
+  const form = document.getElementById('loginFloatingForm');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+};
 function cargarProductoCompletoParaEditar(id_base) {
   const producto = window.todosLosProductos?.find(p => p.id_base === id_base);
   if (producto) {
