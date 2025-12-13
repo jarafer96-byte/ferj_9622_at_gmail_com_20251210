@@ -2659,10 +2659,10 @@ function renderProducto(p) {
   
   const onclickAgregar = `agregarAlCarritoDOM('${nombreEscapado}', 'precio_${p.id_base}', 'cantidad_${p.id_base}', '${p.id_base}', '${grupoEscapado}', '${subgrupoEscapado}')`;
   
-  // 🔥 Variable para fotos adicionales en el FRENTE
+  // 🔥 FOTOS ADICIONALES - SIN TEXTO
   const fotosAdicionalesHTML = fotosAdicionalesSeguras.length > 0 ? `
     <div class="fotos-adicionales mt-2">
-      <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small>
+      <!-- 🔥 QUITADO: <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small> -->
       <div class="d-flex flex-wrap mt-1" style="gap: 3px;">
         ${fotosAdicionalesSeguras.slice(0, 3).map((foto, idx) => `
           <img src="${foto}" 
@@ -2725,7 +2725,7 @@ function renderProducto(p) {
             </button>
           </div>
           
-          <!-- 🔥 FOTOS ADICIONALES SOLO EN EL FRENTE (dentro de card-body) -->
+          <!-- 🔥 FOTOS ADICIONALES (SIN TEXTO) -->
           ${fotosAdicionalesHTML}
           
           ${configWhatsApp ? `
@@ -2760,8 +2760,6 @@ function renderProducto(p) {
             <small><strong>Talles:</strong> ${Object.keys(stockData).join(", ")}</small>
           </div>
         ` : ""}
-        
-        <!-- 🔥 NO MOSTRAR FOTOS ADICIONALES EN EL REVERSO -->
         
         <div class="mt-3">
           <button class="btn btn-secondary btn-sm" onclick="girarCard(this)">
