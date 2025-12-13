@@ -2423,8 +2423,13 @@ function renderProducto(p) {
   card.innerHTML = `
   <div class="card-giratoria">
     <div class="card-contenedor">
-      <!-- FRENTE (lo que ya tenías) -->
+      <!-- FRENTE -->
       <div class="card-front">
+        <!-- Botón para girar -->
+        <button class="btn-girar" onclick="girarCard(this)">
+          🔄
+        </button>
+        
         <img src="${imagenUrl}${imagenUrl.includes('?') ? '&' : '?'}format=webp" 
              alt="${p.nombre}" 
              loading="lazy"
@@ -2437,66 +2442,74 @@ function renderProducto(p) {
         <div class="card-body">
           <h5 class="card-title">${p.nombre}</h5>
           
-          <!-- Información de precio -->
           <p class="mb-2">
             <strong>Precio:</strong> 
             $<span id="precio_${p.id_base}">${p.precio}</span>
           </p>
           
-          <!-- Selector de talle -->
           ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
             <div class="mb-2">
               <label class="form-label mb-1"><strong>Talle:</strong></label>
               <select id="talle_${p.id_base}" class="form-select form-select-sm"
                       onchange="actualizarStockPorTalle('${p.id_base}', this.value)">
-                <option value="">Seleccionar talle...</option>
+                <option value="">Seleccionar...</option>
                 ${opcionesTalles}
               </select>
             </div>
           ` : ""}
           
-          <div class="mt-2 d-flex flex-wrap align-items-center gap-2">
-            <label class="mb-0">Cantidad:</label>
+          <div class="mt-3 d-flex align-items-center gap-2">
             <input type="number" min="1" max="${stockInicial > 0 ? stockInicial : 1}" value="1"
                    id="cantidad_${p.id_base}"
                    class="form-control form-control-sm" style="width: 70px;"
                    ${stockInicial <= 0 ? "disabled" : ""}>
             
-            <button type="button" class="btn btn-secondary" id="btn_agregar_${p.id_base}"
+            <button type="button" class="btn btn-secondary btn-sm" id="btn_agregar_${p.id_base}"
               onclick="${onclickAgregar}"
               ${stockInicial <= 0 ? "disabled style='opacity:0.5'" : ""}>
-              ${stockInicial > 0 ? "Agregar" : "Sin stock"}
+              ${stockInicial > 0 ? "➕ Agregar" : "❌ Sin stock"}
             </button>
           </div>
+          
+          ${configWhatsApp ? `
+            <div class="mt-3">
+              <a href="${configWhatsApp}" class="btn btn-whatsapp btn-sm w-100">
+                💬 WhatsApp
+              </a>
+            </div>
+          ` : ""}
         </div>
       </div>
       
-      <!-- REVERSO (descripción completa) -->
+      <!-- REVERSO -->
       <div class="card-back">
+        <!-- Botón para volver al frente -->
+        <button class="btn-reversa" onclick="girarCard(this)">
+          ↩️
+        </button>
+        
         <h5>${p.nombre}</h5>
         
         <div class="precio">$${p.precio}</div>
         
         ${p.descripcion ? `
-          <div class="descripcion">
-            <strong>Descripción:</strong><br>
+          <div class="descripcion mt-2">
             ${p.descripcion}
           </div>
         ` : '<div class="descripcion text-muted">Sin descripción adicional</div>'}
         
         ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
           <div class="mt-2">
-            <small><strong>Talles disponibles:</strong> ${Object.keys(stockData).join(", ")}</small>
+            <small><strong>Talles:</strong> ${Object.keys(stockData).join(", ")}</small>
           </div>
         ` : ""}
         
-        ${configWhatsApp ? `
-          <a href="${configWhatsApp}" class="btn-whatsapp mt-3">
-            💬 Consultar por WhatsApp
-          </a>
-        ` : ""}
+        <div class="mt-3">
+          <button class="btn btn-secondary btn-sm" onclick="girarCard(this)">
+            🔄 Ver frente
+          </button>
+        </div>
         
-        <!-- Botones admin en el reverso también -->
         ${window.modoAdmin ? `
           <div class="mt-3 d-flex gap-2">
             <button type="button" class="btn btn-warning btn-sm"
@@ -2505,7 +2518,7 @@ function renderProducto(p) {
             </button>
             <button type="button" class="btn btn-danger btn-sm"
               onclick="eliminarProducto('${p.id_base}')">
-              🗑️
+              🗑️ Eliminar
             </button>
           </div>
         ` : ""}
@@ -2571,7 +2584,29 @@ function actualizarUIStock(idProducto, stockDisponible, talleSeleccionado) {
   
   console.log(`✅ Stock actualizado: Talle ${talleSeleccionado} → ${stockDisponible} unidades`);
 }
+// Función para girar las cards
+function girarCard(elemento) {
+  const cardContenedor = elemento.closest('.card-contenedor');
+  if (cardContenedor) {
+    const estaGirada = cardContenedor.style.transform === 'rotateY(180deg)';
+    cardContenedor.style.transform = estaGirada ? 'rotateY(0deg)' : 'rotateY(180deg)';
+  }
+}
 
+// También girar al pasar mouse (opcional)
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.card-giratoria').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      // Opcional: gira automáticamente al pasar mouse
+      // card.querySelector('.card-contenedor').style.transform = 'rotateY(180deg)';
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      // Opcional: vuelve al frente al sacar mouse  
+      // card.querySelector('.card-contenedor').style.transform = 'rotateY(0deg)';
+    });
+  });
+});
 // 👉 Función que arma el array de items reales desde el carrito
 function obtenerCarrito() {
   console.log("🛒 [obtenerCarrito] Mapeando carrito a formato MP:");
