@@ -584,6 +584,12 @@ input.stock-edit {
 .btn-reversa:hover {
   background: rgba(255,255,255,0.2);
 }
+
+
+.fotos-adicionales img:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s;
+}  
 </style>
 </head>
 <body class="container py-5 modo-oscuro">
@@ -651,6 +657,15 @@ input.stock-edit {
     <img id="previewFoto" src="" alt="Sin foto" class="d-none w-100 mb-2">
     <input type="file" id="inputFoto" accept="image/*" class="form-control mb-2">
     <button id="btnQuitarFoto" type="button" class="btn btn-danger mb-2 d-none">❌ Quitar foto</button>
+
+    <!-- Fotos adicionales -->
+    <div class="mb-2">
+      <label class="form-label">Fotos adicionales (opcional)</label>
+      <input type="file" id="fotosAdicionales" accept="image/*" 
+             class="form-control" multiple>
+      <small class="text-muted">Puedes seleccionar varias fotos</small>
+      <div id="previewFotosAdicionales" class="mt-2"></div>
+    </div>
     
     <!-- Datos -->
     <input type="text" id="nombreProd" placeholder="Nombre producto *" class="form-control mb-2">
@@ -821,7 +836,110 @@ if (window.email) {
 function toggleLoginForm() {
   const form = document.getElementById('loginForm');
   form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}    
+}   
+// Previsualizar fotos adicionales
+document.getElementById('fotosAdicionales').addEventListener('change', function(e) {
+  const previewDiv = document.getElementById('previewFotosAdicionales');
+  previewDiv.innerHTML = '';
+  
+  Array.from(e.target.files).forEach((file, index) => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    img.style.width = '80px';
+    img.style.height = '80px';
+    img.style.objectFit = 'cover';
+    img.style.margin = '5px';
+    img.style.borderRadius = '4px';
+    previewDiv.appendChild(img);
+  });
+});
+
+// En la función que guarda el producto, modifica para enviar múltiples fotos
+document.getElementById("btnConfirmarProd").addEventListener("click", async () => {
+  const email = "ferj.9622@gmail.com";
+  if (!email) {
+    alert("❌ No hay email de admin, no se puede guardar");
+    return;
+  }
+
+  try {
+    // 1. Subir foto principal (ya existente)
+    let foto_url = "";
+    if (window.fotoOptimizada) {
+      const formData = new FormData();
+      formData.append("file", window.fotoOptimizada, "producto.jpg");
+      formData.append("email", email);
+
+      const respFoto = await fetch("https://mpagina.onrender.com/subir-foto", {
+        method: "POST",
+        body: formData
+      });
+
+      const fotoData = await respFoto.json();
+      foto_url = fotoData.url || "";
+    }
+
+    // 🔥 NUEVO: Subir fotos adicionales
+    const fotosInput = document.getElementById('fotosAdicionales');
+    const fotosAdicionales = [];
+    
+    if (fotosInput.files.length > 0) {
+      for (let file of fotosInput.files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("email", email);
+
+        const resp = await fetch("https://mpagina.onrender.com/subir-foto", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await resp.json();
+        if (data.url) {
+          fotosAdicionales.push(data.url);
+        }
+      }
+    }
+
+    // 2. Obtener datos del formulario
+    const nombre = document.getElementById("nombreProd").value.trim();
+    const precio = parseFloat(document.getElementById("precioProd").value);
+    const descripcion = document.getElementById("descripcionProd").value.trim();
+    const tallesRaw = document.getElementById("tallesProd").value.trim();
+    const grupo = document.getElementById("grupoProd")?.value.trim() || "General";
+    const subgrupo = document.getElementById("subgrupoProd")?.value.trim() || "general";
+
+    if (!nombre || isNaN(precio) || precio <= 0 || !grupo) {
+      alert("❌ Faltan campos obligatorios: nombre/grupo/precio");
+      return;
+    }
+
+    // 3. Procesar stock (igual que antes)
+    let stockPorTalle = {};
+    const talles = tallesRaw ? tallesRaw.split(",").map(t => t.trim()).filter(Boolean) : [];
+    
+    // ... (tu código de stock existente)
+
+    // 🔥 4. Crear objeto producto CON FOTOS ADICIONALES
+    const producto = {
+      nombre: nombre,
+      precio: precio,
+      descripcion: descripcion || "",
+      talles: talles,
+      grupo: grupo,
+      subgrupo: subgrupo,
+      stock_por_talle: stockPorTalle,
+      imagen_url: foto_url,
+      fotos_adicionales: fotosAdicionales // 👈 Nuevo campo
+    };
+
+    // ... (resto de tu código para enviar al backend)
+
+  } catch (err) {
+    console.error("💥 Error:", err);
+    alert("❌ Error: " + err.message);
+  }
+});    
 function renderizarProductos(productos) {
   console.log("🎨 Renderizando productos:", productos.length);
   
