@@ -2636,8 +2636,7 @@ function renderProducto(p) {
     }
   } else {
     // 🔥 Producto sin talles: en este caso podrías usar un stock general
-    // Pero vamos a crear un campo stock_por_talle con clave "unico"
-    const stockGeneral = p.stock || 0; // Para compatibilidad temporal
+    const stockGeneral = p.stock || 0;
     stockData = { "unico": stockGeneral };
     window[`stock_por_talle_${p.id_base}`] = stockData;
     stockInicial = stockGeneral;
@@ -2659,6 +2658,9 @@ function renderProducto(p) {
   );
   
   const onclickAgregar = `agregarAlCarritoDOM('${nombreEscapado}', 'precio_${p.id_base}', 'cantidad_${p.id_base}', '${p.id_base}', '${grupoEscapado}', '${subgrupoEscapado}')`;
+  
+  // 🔥 CORRECCIÓN: Fotos adicionales FUERA del card-giratoria
+  const tieneFotosAdicionales = fotosAdicionalesSeguras.length > 0;
   
   card.innerHTML = `
   <div class="card-giratoria">
@@ -2709,30 +2711,6 @@ function renderProducto(p) {
               ${stockInicial > 0 ? "➕ Agregar" : "❌ Sin stock"}
             </button>
           </div>
-          
-          <!-- 🔥 FOTOS ADICIONALES EN EL FRENTE -->
-          ${fotosAdicionalesSeguras.length > 0 ? `
-            <div class="fotos-adicionales mt-2">
-              <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small>
-              <div class="d-flex flex-wrap mt-1" style="gap: 3px;">
-                ${fotosAdicionalesSeguras.slice(0, 3).map((foto, idx) => `
-                  <img src="${foto}" 
-                       alt="Foto ${idx+1}" 
-                       style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; cursor: pointer;"
-                       onclick="openModal('${foto}')">
-                `).join('')}
-                ${fotosAdicionalesSeguras.length > 3 ? `<span class="ms-1 text-muted">+${fotosAdicionalesSeguras.length - 3}</span>` : ''}
-              </div>
-            </div>
-          ` : ''}
-          
-          ${configWhatsApp ? `
-            <div class="mt-3">
-              <a href="${configWhatsApp}" class="btn btn-whatsapp btn-sm w-100">
-                Contactar por WhatsApp
-              </a>
-            </div>
-          ` : ""}
         </div>
       </div>
       
@@ -2759,21 +2737,7 @@ function renderProducto(p) {
           </div>
         ` : ""}
         
-        <!-- 🔥 FOTOS ADICIONALES TAMBIÉN EN EL REVERSO -->
-        ${fotosAdicionalesSeguras.length > 0 ? `
-          <div class="fotos-adicionales mt-2">
-            <small><strong>Fotos adicionales:</strong></small>
-            <div class="d-flex flex-wrap mt-1 justify-content-center" style="gap: 5px;">
-              ${fotosAdicionalesSeguras.slice(0, 4).map((foto, idx) => `
-                <img src="${foto}" 
-                     alt="Foto ${idx+1}" 
-                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;"
-                     onclick="openModal('${foto}')">
-              `).join('')}
-              ${fotosAdicionalesSeguras.length > 4 ? `<span class="ms-1 text-muted">+${fotosAdicionalesSeguras.length - 4} más</span>` : ''}
-            </div>
-          </div>
-        ` : ''}
+        <!-- 🔥 REMOVIDO: FOTOS ADICIONALES DEL REVERSO -->
         
         <div class="mt-3">
           <button class="btn btn-secondary btn-sm" onclick="girarCard(this)">
@@ -2796,6 +2760,30 @@ function renderProducto(p) {
       </div>
     </div>
   </div>
+  
+  <!-- 🔥 FOTOS ADICIONALES FUERA de la card giratoria (DEBAJO del botón WhatsApp) -->
+  ${configWhatsApp ? `
+    <div class="mt-3">
+      <a href="${configWhatsApp}" class="btn btn-whatsapp btn-sm w-100">
+        Contactar por WhatsApp
+      </a>
+    </div>
+  ` : ""}
+  
+  ${fotosAdicionalesSeguras.length > 0 ? `
+    <div class="fotos-adicionales mt-2">
+      <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small>
+      <div class="d-flex flex-wrap mt-1" style="gap: 3px;">
+        ${fotosAdicionalesSeguras.slice(0, 4).map((foto, idx) => `
+          <img src="${foto}" 
+               alt="Foto ${idx+1}" 
+               style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;"
+               onclick="openModal('${foto}')">
+        `).join('')}
+        ${fotosAdicionalesSeguras.length > 4 ? `<span class="ms-1 text-muted">+${fotosAdicionalesSeguras.length - 4}</span>` : ''}
+      </div>
+    </div>
+  ` : ''}
 `;
 
   // 🔥 Configurar talle inicial después de renderizar
