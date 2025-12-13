@@ -2659,10 +2659,27 @@ function renderProducto(p) {
   
   const onclickAgregar = `agregarAlCarritoDOM('${nombreEscapado}', 'precio_${p.id_base}', 'cantidad_${p.id_base}', '${p.id_base}', '${grupoEscapado}', '${subgrupoEscapado}')`;
   
+  // 🔥 CREAR URL DE WHATSAPP ESPECÍFICA PARA ESTE PRODUCTO
+  let whatsappUrl = configWhatsApp; // URL base del archivo de configuración
+  
+  if (configWhatsApp && configWhatsApp.includes("wa.me")) {
+    // Si ya es un enlace de WhatsApp, agregar texto específico del producto
+    const mensaje = encodeURIComponent(`Hola! Me interesa el producto: "${p.nombre}" - Precio: $${p.precio}\n\n¿Podrías darme más información?`);
+    
+    // Extraer número de teléfono de configWhatsApp (ej: "https://wa.me/5492975158178")
+    const match = configWhatsApp.match(/wa\.me\/(\d+)/);
+    if (match) {
+      const numero = match[1];
+      whatsappUrl = `https://wa.me/${numero}?text=${mensaje}`;
+    } else {
+      // Si no se puede extraer, usar la URL base con parámetro text
+      whatsappUrl = `${configWhatsApp}?text=${mensaje}`;
+    }
+  }
+  
   // 🔥 FOTOS ADICIONALES - SIN TEXTO
   const fotosAdicionalesHTML = fotosAdicionalesSeguras.length > 0 ? `
     <div class="fotos-adicionales mt-2">
-      <!-- 🔥 QUITADO: <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small> -->
       <div class="d-flex flex-wrap mt-1" style="gap: 3px;">
         ${fotosAdicionalesSeguras.slice(0, 3).map((foto, idx) => `
           <img src="${foto}" 
@@ -2728,10 +2745,12 @@ function renderProducto(p) {
           <!-- 🔥 FOTOS ADICIONALES (SIN TEXTO) -->
           ${fotosAdicionalesHTML}
           
-          ${configWhatsApp ? `
+          <!-- 🔥 BOTÓN WHATSAPP ESPECÍFICO PARA ESTE PRODUCTO -->
+          ${whatsappUrl ? `
             <div class="mt-3">
-              <a href="${configWhatsApp}" class="btn btn-whatsapp btn-sm w-100">
-                Contactar por WhatsApp
+              <a href="${whatsappUrl}" class="btn btn-whatsapp btn-sm w-100" target="_blank">
+                <img src="/static/img/whatsapp.png" alt="WhatsApp" style="width: 20px; margin-right: 5px;">
+                Consultar sobre el producto 
               </a>
             </div>
           ` : ""}
