@@ -2447,15 +2447,16 @@ function renderProducto(p) {
           </p>
           
           ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
-            <div class="mb-2">
-              <label class="form-label mb-1"><strong>Talle:</strong></label>
-              <select id="talle_${p.id_base}" class="form-select form-select-sm"
-                      onchange="actualizarStockPorTalle('${p.id_base}', this.value)">
-                <option value="">Seleccionar...</option>
-                ${opcionesTalles}
-              </select>
-            </div>
-          ` : ""}
+  <div class="mb-2 d-flex align-items-center gap-2">
+    <label class="mb-0"><strong>Talle:</strong></label>
+    <select id="talle_${p.id_base}" class="form-select form-select-sm w-auto"
+            onchange="actualizarStockPorTalle('${p.id_base}', this.value)"
+            style="min-width: 80px; max-width: 120px;">
+      <option value="">-</option>
+      ${opcionesTalles}
+    </select>
+  </div>
+` : ""}
           
           <div class="mt-3 d-flex align-items-center gap-2">
             <input type="number" min="1" max="${stockInicial > 0 ? stockInicial : 1}" value="1"
