@@ -1089,39 +1089,6 @@ document.getElementById("btnConfirmarProd").addEventListener("click", async () =
     alert("❌ Error al guardar producto: " + err.message);
   }
 });
-// 🔥 NUEVO: Subir fotos adicionales a Google Cloud
-const fotosAdicionalesSubidas = [];
-const fotosInput = document.getElementById('fotosAdicionales');
-
-if (fotosInput && fotosInput.files && fotosInput.files.length > 0) {
-  console.log(`📸 Subiendo ${fotosInput.files.length} fotos adicionales...`);
-  
-  for (let file of fotosInput.files) {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("email", email);
-
-      const resp = await fetch("https://mpagina.onrender.com/subir-foto", {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await resp.json();
-      if (data.url) {
-        fotosAdicionalesSubidas.push(data.url);
-        console.log(`✅ Foto adicional subida: ${data.url}`);
-      }
-    } catch (err) {
-      console.error("❌ Error subiendo foto adicional:", err);
-    }
-  }
-}
-
-// También incluir fotos existentes si estamos editando
-if (window.fotosAdicionalesExistentes) {
-  fotosAdicionalesSubidas.push(...window.fotosAdicionalesExistentes);
-}
     
 function renderizarProductos(productos) {
   console.log("🎨 Renderizando productos:", productos.length);
