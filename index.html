@@ -25,141 +25,142 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/static/img/faviconmovil.png">
 
 <style>
-/* 📐 REFLEJO DETRÁS DE CADA CARD */
+/* 📐 REFLEJO DETRÁS DE CADA CARD - VERSIÓN CORREGIDA */
 .card {
     position: relative;
     overflow: visible; /* Permitir que el reflejo se vea */
+    z-index: 2; /* Asegurar que esté por encima del fondo */
+    background-color: transparent !important; /* Importante para que se vea el fondo */
 }
 
+/* EL REFLEJO DEBE TENER UN z-index NEGATIVO para estar DETRÁS de la card
+   pero POR ENCIMA del fondo */
 .card::after {
     content: '';
     position: absolute;
-    top: 100%; /* Colocar debajo de la card */
-    left: 5%;
-    width: 90%;
+    top: calc(100% + 5px); /* Un poco más abajo para que no se corte */
+    left: 10%;
+    width: 80%;
     height: 20px;
     background: linear-gradient(to bottom, 
-        rgba(255, 255, 255, 0.3) 0%, 
-        rgba(255, 255, 255, 0.1) 20%, 
+        rgba(255, 255, 255, 0.4) 0%, 
+        rgba(255, 255, 255, 0.15) 30%, 
         transparent 100%);
     border-radius: 50%;
-    transform: perspective(200px) rotateX(60deg) scaleY(0.5);
-    filter: blur(5px);
-    opacity: 0.7;
-    z-index: -1;
+    transform: perspective(300px) rotateX(60deg) scaleY(0.5);
+    filter: blur(8px);
+    opacity: 0.8;
+    z-index: 1; /* 🔥 CAMBIADO: positivo pero menor que la card */
     pointer-events: none;
     transition: all 0.3s ease;
+}
+
+/* MODIFICAR EL OVERLAY DEL BODY para que NO tape el reflejo */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: -1; /* 🔥 Asegurar que esté DETRÁS de todo */
+}
+
+/* El fondo animado también debe estar detrás */
+.fondo-animado {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -2; /* 🔥 Un nivel más atrás que el overlay */
+    /* ... resto de estilos ... */
+}
+
+/* Asegurar que el contenedor de productos tenga buen z-index */
+.productos-container {
+    position: relative;
+    z-index: 3; /* Por encima del fondo pero debajo de las cards */
+}
+
+/* Los botones y otros elementos deben estar sobre el reflejo */
+.card .btn,
+.card img,
+.card-body {
+    position: relative;
+    z-index: 3; /* Por encima del reflejo */
 }
 
 /* Modo oscuro - reflejo más tenue */
 .modo-oscuro .card::after {
     background: linear-gradient(to bottom, 
-        rgba(255, 255, 255, 0.2) 0%, 
-        rgba(255, 255, 255, 0.05) 20%, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        rgba(255, 255, 255, 0.1) 20%, 
         transparent 100%);
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 /* Modo claro - reflejo más definido */
 .modo-claro .card::after {
     background: linear-gradient(to bottom, 
-        rgba(0, 0, 0, 0.2) 0%, 
+        rgba(0, 0, 0, 0.25) 0%, 
         rgba(0, 0, 0, 0.1) 20%, 
         transparent 100%);
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 /* Efecto al hacer hover - el reflejo se intensifica */
 .card:hover::after {
     opacity: 0.9;
     height: 25px;
-    filter: blur(8px);
-    transform: perspective(200px) rotateX(60deg) scaleY(0.6);
+    filter: blur(10px);
+    transform: perspective(300px) rotateX(60deg) scaleY(0.7);
+    top: calc(100% + 8px); /* Baja un poco más al hacer hover */
 }
 
 /* Ajuste para móviles - reflejo más sutil */
 @media (max-width: 768px) {
     .card::after {
-        height: 15px;
-        filter: blur(3px);
-        opacity: 0.5;
-        transform: perspective(200px) rotateX(60deg) scaleY(0.4);
+        height: 12px;
+        filter: blur(4px);
+        opacity: 0.6;
+        top: calc(100% + 3px);
+        left: 15%;
+        width: 70%;
     }
     
     .card:hover::after {
-        opacity: 0.6;
-        height: 18px;
-        filter: blur(4px);
+        opacity: 0.7;
+        height: 15px;
+        filter: blur(5px);
+        top: calc(100% + 4px);
     }
 }
 
-/* Reflejo más pronunciado en cards con imágenes grandes */
+/* Variación para cards con imágenes grandes */
+.card-img-top + .card-body {
+    position: relative;
+}
+
+/* Si el card tiene imagen, ajustar el reflejo */
 .card img + .card-body::after {
-    height: 25px;
-    top: calc(100% - 5px);
-}
-
-/* Variación para cards con colores vibrantes */
-.card[data-color="vibrant"]::after {
-    background: linear-gradient(to bottom, 
-        rgba(255, 107, 107, 0.3) 0%, 
-        rgba(255, 107, 107, 0.1) 20%, 
-        transparent 100%);
-}
-
-/* Efecto de profundidad en el contenedor de productos */
-.productos-container {
-    position: relative;
-    z-index: 1;
-}
-
-/* Asegurar que el z-index sea correcto */
-.card-producto {
-    position: relative;
-    z-index: 2;
-}
-
-/* Si quieres un efecto de reflejo más complejo (espejado) */
-.card.reflejo-completo {
-    position: relative;
-    margin-bottom: 40px;
-}
-
-.card.reflejo-completo::before {
     content: '';
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    height: 30px;
-    background: linear-gradient(to bottom, 
-        rgba(255, 255, 255, 0.4) 0%, 
-        rgba(255, 255, 255, 0.1) 50%, 
-        transparent 100%);
-    transform: scaleY(-1);
-    opacity: 0.4;
-    border-radius: 50%;
-    filter: blur(8px);
-    z-index: -1;
-}
-
-/* Reflejo angular (como en superficies brillantes) */
-.card.reflejo-angulado::after {
-    content: '';
-    position: absolute;
-    top: 100%;
+    top: 5px;
     left: 10%;
     width: 80%;
     height: 15px;
-    background: linear-gradient(135deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
+    background: linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        rgba(255, 255, 255, 0.1) 30%, 
         transparent 100%);
-    transform: rotate(-3deg);
-    filter: blur(4px);
+    border-radius: 50%;
+    transform: perspective(200px) rotateX(60deg) scaleY(0.4);
+    filter: blur(5px);
     opacity: 0.6;
-    z-index: -1;
-}  
+    z-index: 1;
+}
 body {
   font-family: {{ config.fuente | safe }};
   {% if config.estilo_visual %}
