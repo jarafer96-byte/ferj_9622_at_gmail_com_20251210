@@ -2635,7 +2635,7 @@ function renderProducto(p) {
       stockInicial = stockData[talleInicial] || 0;
     }
   } else {
-    // 🔥 Producto sin talles: en este caso podrías usar un stock general
+    // 🔥 Producto sin talles
     const stockGeneral = p.stock || 0;
     stockData = { "unico": stockGeneral };
     window[`stock_por_talle_${p.id_base}`] = stockData;
@@ -2652,15 +2652,28 @@ function renderProducto(p) {
   const grupoEscapado = (p.grupo || "").replace(/'/g, "\\'");
   const subgrupoEscapado = (p.subgrupo || "").replace(/'/g, "\\'");
   
-  // Escapar URLs de fotos adicionales para evitar errores
+  // Escapar URLs de fotos adicionales
   const fotosAdicionalesSeguras = (p.fotos_adicionales || []).map(foto => 
     foto.replace(/'/g, "\\'").replace(/"/g, '\\"')
   );
   
   const onclickAgregar = `agregarAlCarritoDOM('${nombreEscapado}', 'precio_${p.id_base}', 'cantidad_${p.id_base}', '${p.id_base}', '${grupoEscapado}', '${subgrupoEscapado}')`;
   
-  // 🔥 CORRECCIÓN: Fotos adicionales FUERA del card-giratoria
-  const tieneFotosAdicionales = fotosAdicionalesSeguras.length > 0;
+  // 🔥 Variable para fotos adicionales en el FRENTE
+  const fotosAdicionalesHTML = fotosAdicionalesSeguras.length > 0 ? `
+    <div class="fotos-adicionales mt-2">
+      <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small>
+      <div class="d-flex flex-wrap mt-1" style="gap: 3px;">
+        ${fotosAdicionalesSeguras.slice(0, 3).map((foto, idx) => `
+          <img src="${foto}" 
+               alt="Foto ${idx+1}" 
+               style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; cursor: pointer;"
+               onclick="openModal('${foto}')">
+        `).join('')}
+        ${fotosAdicionalesSeguras.length > 3 ? `<span class="ms-1 text-muted">+${fotosAdicionalesSeguras.length - 3}</span>` : ''}
+      </div>
+    </div>
+  ` : '';
   
   card.innerHTML = `
   <div class="card-giratoria">
@@ -2711,6 +2724,17 @@ function renderProducto(p) {
               ${stockInicial > 0 ? "➕ Agregar" : "❌ Sin stock"}
             </button>
           </div>
+          
+          <!-- 🔥 FOTOS ADICIONALES SOLO EN EL FRENTE (dentro de card-body) -->
+          ${fotosAdicionalesHTML}
+          
+          ${configWhatsApp ? `
+            <div class="mt-3">
+              <a href="${configWhatsApp}" class="btn btn-whatsapp btn-sm w-100">
+                Contactar por WhatsApp
+              </a>
+            </div>
+          ` : ""}
         </div>
       </div>
       
@@ -2737,7 +2761,7 @@ function renderProducto(p) {
           </div>
         ` : ""}
         
-        <!-- 🔥 REMOVIDO: FOTOS ADICIONALES DEL REVERSO -->
+        <!-- 🔥 NO MOSTRAR FOTOS ADICIONALES EN EL REVERSO -->
         
         <div class="mt-3">
           <button class="btn btn-secondary btn-sm" onclick="girarCard(this)">
@@ -2760,33 +2784,9 @@ function renderProducto(p) {
       </div>
     </div>
   </div>
-  
-  <!-- 🔥 FOTOS ADICIONALES FUERA de la card giratoria (DEBAJO del botón WhatsApp) -->
-  ${configWhatsApp ? `
-    <div class="mt-3">
-      <a href="${configWhatsApp}" class="btn btn-whatsapp btn-sm w-100">
-        Contactar por WhatsApp
-      </a>
-    </div>
-  ` : ""}
-  
-  ${fotosAdicionalesSeguras.length > 0 ? `
-    <div class="fotos-adicionales mt-2">
-      <small class="text-muted">+${fotosAdicionalesSeguras.length} foto(s) adicionales</small>
-      <div class="d-flex flex-wrap mt-1" style="gap: 3px;">
-        ${fotosAdicionalesSeguras.slice(0, 4).map((foto, idx) => `
-          <img src="${foto}" 
-               alt="Foto ${idx+1}" 
-               style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;"
-               onclick="openModal('${foto}')">
-        `).join('')}
-        ${fotosAdicionalesSeguras.length > 4 ? `<span class="ms-1 text-muted">+${fotosAdicionalesSeguras.length - 4}</span>` : ''}
-      </div>
-    </div>
-  ` : ''}
 `;
 
-  // 🔥 Configurar talle inicial después de renderizar
+  // 🔥 Configurar talle inicial
   if (talleInicial) {
     setTimeout(() => {
       const talleSelect = document.getElementById(`talle_${p.id_base}`);
