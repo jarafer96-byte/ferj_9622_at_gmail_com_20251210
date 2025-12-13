@@ -49,6 +49,10 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
 }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}  
 @keyframes moverFondo { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
   
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -122,7 +126,7 @@ html { scroll-behavior: auto; }
 
 .oculta { display: none !important; }
 
-.logo { height: 40vw; max-height: 380px; filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 14px white); transition: filter 0.3s ease; animation: pulsoLogo 4s ease-in-out infinite; }
+.logo { height: 40vw; animation: pulsoLogo 4s ease-in-out infinite, float 6s ease-in-out infinite; max-height: 380px; filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 14px white); transition: filter 0.3s ease; animation: pulsoLogo 4s ease-in-out infinite; }
 
 .descripcion-emprendimiento { background-color: rgba(0, 0, 0, 0.5); color: white; padding: 20px; border-radius: 10px; display: inline-block; max-width: 800px; white-space: pre-line; text-align: center; text-indent: 20px; font-size: 16px; line-height: 1.6; box-shadow: 0 0 6px rgba(255,255,255,0.3); }
 
