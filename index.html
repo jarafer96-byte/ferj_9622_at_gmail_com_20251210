@@ -27,15 +27,11 @@
 <style>
 
 body {
-  font-family: 'Quicksand', sans-serif;
-  background-image: url("/static/img/mini_1_jfjf8.jpeg");
-  background-size: auto;
-  background-repeat: repeat;
-  background-position: top left;
-  background-attachment: fixed;
-  padding-top: 70px;
-  position: relative;
-  z-index: 1;
+    font-family: {{ config.fuente | safe }};
+    position: relative; /* IMPORTANTE */
+    min-height: 100vh;
+    padding-top: 70px;
+    /* REMOVER background-image de aquí */
 }
 /* 📱 Para móviles */
 @media (max-width: 768px) {
