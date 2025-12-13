@@ -75,7 +75,30 @@ body::before {
 
 html { scroll-behavior: auto; }
 
-.card { transition: transform 0.3s ease, box-shadow 0.3s ease; border-radius: 12px; overflow: hidden; will-change: transform, box-shadow; padding: 12px; }
+/* VERSIÓN SIMPLIFICADA */
+.card {
+    position: relative;
+    overflow: visible;
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 5%;
+    width: 90%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    filter: blur(5px);
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.card:hover::after {
+    opacity: 0.8;
+    filter: blur(8px);
+}
 
 .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
 
