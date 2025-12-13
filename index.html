@@ -27,13 +27,13 @@
 <style>
 
 body {
-  font-family: {{ config.fuente | safe }};
-  {% if config.estilo_visual %}
-  background-image: url("/static/img/{{ config.estilo_visual }}.jpeg");
-  {% else %}
-  background-color: #121212; /* fallback seguro */
-  {% endif %}
-  background-size: cover; background-repeat: no-repeat; background-attachment: fixed; background-position: center; padding-top: 70px;
+  font-family: 'Quicksand', sans-serif;
+  background-image: url("/static/img/fondo.jpg");
+  background-size: auto;
+  background-repeat: repeat;
+  background-position: top left;
+  background-attachment: fixed;
+  padding-top: 70px;
 }
 /* 📱 Para móviles */
 @media (max-width: 768px) {
