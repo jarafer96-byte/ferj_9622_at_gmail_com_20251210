@@ -2496,10 +2496,10 @@ function renderProducto(p) {
         <div class="precio">$${p.precio}</div>
         
         ${p.descripcion ? `
-          <div class="descripcion mt-2">
-            ${p.descripcion}
-          </div>
-        ` : '<div class="descripcion text-muted">Sin descripción adicional</div>'}
+  <div class="descripcion mt-2" style="white-space: pre-line;">
+    ${p.descripcion}
+  </div>
+` : '<div class="descripcion text-muted">Sin descripción adicional</div>'}
         
         ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
           <div class="mt-2">
