@@ -219,8 +219,12 @@ html { scroll-behavior: auto; }
   font-weight: bold;
   box-shadow: 0 0 5px white;
   cursor: pointer;
+  z-index: 1000;
 }
-
+/* Botones fijos en orden z-index */
+#volverArriba { z-index: 1000; }
+#loginToggleBtn { z-index: 997; }
+#loginFloatingForm { z-index: 997; }
 .modo-oscuro #toggleCarrito {
   background-color: transparent;
   color: black;
@@ -587,20 +591,19 @@ input.stock-edit {
   </div>
 
   
-<!-- Botón para mostrar/ocultar login -->
-<div class="text-center mt-5">
-  <button type="button" class="btn-grupo" onclick="toggleLoginForm()">
-    🔐 Acceso Admin
-  </button>
-</div>
+<!-- Botón flotante para login -->
+<button id="loginToggleBtn" style="position:fixed; bottom:80px; left:20px; z-index:997; display:none;">
+  🔐 Admin
+</button>
 
-<!-- Formulario OCULTO inicialmente -->
-<form id="loginForm" onsubmit="loginAdmin(event)" 
-      class="mt-3 text-center" style="display: none;">
-  <input type="text" id="usuario_login" placeholder="Usuario" required>
-  <input type="password" id="clave_login" placeholder="Contraseña" required>
-  <button type="submit" class="btn-grupo">Entrar</button>
-</form>
+<!-- Formulario flotante para login -->
+<div id="loginFloatingForm" style="position:fixed; bottom:120px; left:20px; z-index:997; display:none; background:rgba(0,0,0,0.9); padding:15px; border-radius:10px; width:250px;">
+  <form onsubmit="loginAdmin(event)">
+    <input type="text" placeholder="Usuario" required class="form-control mb-2">
+    <input type="password" placeholder="Contraseña" required class="form-control mb-2">
+    <button type="submit" class="btn-grupo w-100">Entrar</button>
+  </form>
+</div>
 
 <div class="text-center mt-4" id="logoutAdminWrapper" style="display:none;">
   <button type="button" class="btn-grupo" onclick="salirAdmin()">🚪 Salir</button>
