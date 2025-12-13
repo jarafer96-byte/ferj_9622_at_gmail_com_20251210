@@ -2278,13 +2278,7 @@ function renderProducto(p) {
             </select>
           </div>
         ` : ""}
-        
-        <!-- Stock disponible -->
-        <p class="mb-2">
-          <strong>Disponible:</strong> 
-          <span id="stock_${p.id_base}" class="${claseStock}">${mostrarStock}</span>
-        </p>
-        
+         
         ${configWhatsApp ? `<a href="${configWhatsApp}" class="btn btn-whatsapp">Contactar por WhatsApp</a>` : ""}
         
         <div class="mt-2 d-flex flex-wrap align-items-center gap-2">
