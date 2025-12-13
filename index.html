@@ -26,34 +26,40 @@
 
 <style>
 body {
-  font-family: 'Raleway', sans-serif;
-  
-  background-image: url("/static/img/mini_1_jfjf8.jpeg");
-  
+  font-family: {{ config.fuente | safe }};
+  {% if config.estilo_visual %}
+  background-image: url("/static/img/{{ config.estilo_visual }}.jpeg");
+  {% else %}
+  background-color: #121212; /* fallback seguro */
+  {% endif %}
   background-size: cover; background-repeat: no-repeat; background-attachment: fixed; background-position: center; padding-top: 70px;
 }
 /* 📱 Para móviles */
 @media (max-width: 768px) {
   body {
-    background-image: url("/static/img/mini_1_jfjf8.jpeg");
+    background-image: url("/static/img/fondo-movil.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
   }
+}
+/* 📱 En pantallas chicas (celulares) */
+@media (max-width: 768px) {
+  body {
+    background-size: cover; /* ocupa toda la pantalla */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+  }
+}
+/* 📱 Solo en pantallas chicas (ej: móviles) */
+@media (max-width: 768px) {
   .barra-navegacion {
     border: 1px solid #000000f5; /* borde solo en móvil */
   }
-}
-@keyframes moverFondo { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
-  
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  
-@keyframes pulsoLogo { 0%, 100% { filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 14px none); } 50% { filter: brightness(1.8) contrast(1.3) drop-shadow(0 0 20px none); } }
-
-@media (min-width: 1024px) { .logo { width: 150px; height: 150px; max-height: none; } }  
-  
-h1, h2, h3, .btn, .card { font-family: 'Raleway', sans-serif; }
+}  
+h1, h2, h3, .btn, .card { font-family: {{ config.fuente | safe }}; }
 
 body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: -1; }
 
@@ -97,8 +103,12 @@ html { scroll-behavior: auto; }
 
 .barra-navegacion { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); display: flex; justify-content: center; gap: 16px; padding: 12px 20px; box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1); }
 
-.barra-navegacion button { font-family: 'Raleway', sans-serif; font-weight: 600; font-size: 16px; padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: white; box-shadow: 0 0 6px rgba(255, 255, 255, 0.2); transition: all 0.3s ease; }
+.barra-navegacion button { font-family: {{ config.fuente | safe }}; font-weight: 600; font-size: 16px; padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: white; box-shadow: 0 0 6px rgba(255, 255, 255, 0.2); transition: all 0.3s ease; }
 
+/* Animaciones */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes moverFondo { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
 
 .barra-navegacion button:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
 
@@ -112,13 +122,15 @@ html { scroll-behavior: auto; }
 } 
 .panel-grupos { position: fixed; scrollbar-width: none; -webkit-overflow-scrolling: touch; overflow-y: hidden; overflow-x: auto; white-space: nowrap; cursor: grab; cursor: -webkit-grab; border: 1px solid #000000f5; max-height: 50vh; overflow-y: auto; left: 0; right: 0; z-index: 906; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); padding: 1px 0; text-align: center; box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1); }
 
-.panel-grupos button { font-family: 'Raleway', sans-serif; font-weight: 600; margin: 6px; padding: 2px 8px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px; background: rgba(255, 255, 255, 0.05); color: white; box-shadow: 0 0 6px rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease; }
+.panel-grupos button { font-family: {{ config.fuente | safe }}; font-weight: 600; margin: 6px; padding: 2px 8px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px; background: rgba(255, 255, 255, 0.05); color: white; box-shadow: 0 0 6px rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease; }
 
 .panel-grupos button:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
 
 .oculta { display: none !important; }
 
 .logo { height: 40vw; max-height: 380px; filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 14px white); transition: filter 0.3s ease; animation: pulsoLogo 4s ease-in-out infinite; }
+
+@keyframes pulsoLogo { 0%, 100% { filter: brightness(1.5) contrast(1.2) drop-shadow(0 0 14px none); } 50% { filter: brightness(1.8) contrast(1.3) drop-shadow(0 0 20px none); } }
 
 .descripcion-emprendimiento { background-color: rgba(0, 0, 0, 0.5); color: white; padding: 20px; border-radius: 10px; display: inline-block; max-width: 800px; white-space: pre-line; text-align: center; text-indent: 20px; font-size: 16px; line-height: 1.6; box-shadow: 0 0 6px rgba(255,255,255,0.3); }
 
@@ -289,9 +301,11 @@ input.stock-edit {
 }
 .panel-subcategorias { position: fixed; scrollbar-width: none; -webkit-overflow-scrolling: touch; overflow-y: hidden; overflow-x: auto; white-space: nowrap; cursor: grab; cursor: -webkit-grab; border: 1px solid #000000f5; max-height: 50vh; overflow-y: auto; left: 0; right: 0; z-index: 908; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); padding: 1px 0; text-align: center; box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
 
-.panel-subcategorias button { font-family: 'Raleway', sans-serif; font-weight: 600; margin: 6px; padding: 1px 8px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px; background: rgba(255, 255, 255, 0.05); color: white; box-shadow: 0 0 6px rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease; }
+.panel-subcategorias button { font-family: {{ config.fuente | safe }}; font-weight: 600; margin: 6px; padding: 1px 8px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 30px; background: rgba(255, 255, 255, 0.05); color: white; box-shadow: 0 0 6px rgba(255, 255, 255, 0.2); cursor: pointer; transition: all 0.3s ease; }
 
 .panel-subcategorias button:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+
+@media (min-width: 1024px) { .logo { width: 150px; height: 150px; max-height: none; } }
 
 .barra-navegacion { padding: 8px 10px; gap: 8px; }
 
@@ -310,7 +324,10 @@ input.stock-edit {
   margin-top: 20px;   /* espacio fijo arriba */
   margin-bottom: 20px;/* espacio fijo abajo */
 }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+@keyframes moverFondo { 0% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } 100% { background-position: 0% 0%; } }
+/* Imagen dentro de la card */
 #previewFoto {
   width: 300px;
   height: 180px;
