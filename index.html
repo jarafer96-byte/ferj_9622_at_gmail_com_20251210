@@ -591,13 +591,13 @@ input.stock-edit {
   </div>
 
   
-<!-- Botón flotante para login -->
-<button id="loginToggleBtn" style="position:fixed; bottom:80px; left:20px; z-index:997; display:none;">
+<!-- Botón Admin flotante en el centro -->
+<button id="loginToggleBtn" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:999; display:none; background:rgba(0,0,0,0.8); color:white; border:none; padding:10px 20px; border-radius:20px;">
   🔐 Admin
 </button>
 
-<!-- Formulario flotante para login -->
-<div id="loginFloatingForm" style="position:fixed; bottom:120px; left:20px; z-index:997; display:none; background:rgba(0,0,0,0.9); padding:15px; border-radius:10px; width:250px;">
+<!-- Formulario flotante -->
+<div id="loginFloatingForm" style="position:fixed; bottom:70px; left:50%; transform:translateX(-50%); z-index:999; display:none; background:rgba(0,0,0,0.9); padding:15px; border-radius:10px; width:250px;">
   <form onsubmit="loginAdmin(event)">
     <input type="text" placeholder="Usuario" required class="form-control mb-2">
     <input type="password" placeholder="Contraseña" required class="form-control mb-2">
