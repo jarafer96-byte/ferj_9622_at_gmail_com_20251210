@@ -42,22 +42,11 @@ body {
     background-attachment: fixed;
     background-position: center;
   }
-}
-/* 📱 En pantallas chicas (celulares) */
-@media (max-width: 768px) {
-  body {
-    background-size: cover; /* ocupa toda la pantalla */
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-  }
-}
-/* 📱 Solo en pantallas chicas (ej: móviles) */
-@media (max-width: 768px) {
   .barra-navegacion {
     border: 1px solid #000000f5; /* borde solo en móvil */
   }
-}  
+}
+
 h1, h2, h3, .btn, .card { font-family: {{ config.fuente | safe }}; }
 
 body::before {
