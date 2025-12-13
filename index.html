@@ -451,7 +451,77 @@ input.stock-edit {
   border: 2px solid #000;
   box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
-  
+
+
+/* Card giratoria */
+.card-giratoria {
+  perspective: 1000px;
+  height: 400px; /* Ajusta según necesites */
+}
+
+.card-contenedor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.card-giratoria:hover .card-contenedor {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.card-back {
+  background-color: rgba(0,0,0,0.85);
+  color: white;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.card-back h5 {
+  color: #ff6b8b;
+  margin-bottom: 15px;
+}
+
+.card-back .precio {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4cd964;
+  margin: 10px 0;
+}
+
+.card-back .descripcion {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 10px 0;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0 10px;
+}
+
+.card-back .btn-whatsapp {
+  margin-top: 15px;
+  background-color: #25D366;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+}  
 </style>
 </head>
 <body class="container py-5 modo-oscuro">
@@ -2303,75 +2373,98 @@ function renderProducto(p) {
     '';
   
   card.innerHTML = `
-    <div class="card p-3 h-100">
-      <img src="${imagenUrl}${imagenUrl.includes('?') ? '&' : '?'}format=webp" 
-           alt="${p.nombre}" 
-           loading="lazy"
-           width="300" 
-           height="180"
-           style="width:300px;height:180px;object-fit:contain;border-radius:4px;cursor:pointer;"
-           onload="this.style.opacity='1'"
-           style="opacity:0; transition: opacity 0.3s ease;"
-           onclick="openModal('${imagenUrl}')">
-      <div class="card-body">
-        <h5 class="card-title">${p.nombre}</h5>
+  <div class="card-giratoria">
+    <div class="card-contenedor">
+      <!-- FRENTE (lo que ya tenías) -->
+      <div class="card-front">
+        <img src="${imagenUrl}${imagenUrl.includes('?') ? '&' : '?'}format=webp" 
+             alt="${p.nombre}" 
+             loading="lazy"
+             width="300" 
+             height="180"
+             style="width:100%; height:180px; object-fit:contain; border-radius:4px; cursor:pointer;"
+             onload="this.style.opacity='1'"
+             style="opacity:0; transition: opacity 0.3s ease;"
+             onclick="openModal('${imagenUrl}')">
+        <div class="card-body">
+          <h5 class="card-title">${p.nombre}</h5>
+          
+          <!-- Información de precio -->
+          <p class="mb-2">
+            <strong>Precio:</strong> 
+            $<span id="precio_${p.id_base}">${p.precio}</span>
+          </p>
+          
+          <!-- Selector de talle -->
+          ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
+            <div class="mb-2">
+              <label class="form-label mb-1"><strong>Talle:</strong></label>
+              <select id="talle_${p.id_base}" class="form-select form-select-sm"
+                      onchange="actualizarStockPorTalle('${p.id_base}', this.value)">
+                <option value="">Seleccionar talle...</option>
+                ${opcionesTalles}
+              </select>
+            </div>
+          ` : ""}
+          
+          <div class="mt-2 d-flex flex-wrap align-items-center gap-2">
+            <label class="mb-0">Cantidad:</label>
+            <input type="number" min="1" max="${stockInicial > 0 ? stockInicial : 1}" value="1"
+                   id="cantidad_${p.id_base}"
+                   class="form-control form-control-sm" style="width: 70px;"
+                   ${stockInicial <= 0 ? "disabled" : ""}>
+            
+            <button type="button" class="btn btn-secondary" id="btn_agregar_${p.id_base}"
+              onclick="${onclickAgregar}"
+              ${stockInicial <= 0 ? "disabled style='opacity:0.5'" : ""}>
+              ${stockInicial > 0 ? "Agregar" : "Sin stock"}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- REVERSO (descripción completa) -->
+      <div class="card-back">
+        <h5>${p.nombre}</h5>
         
-        <!-- Descripción del producto -->
-        ${mostrarDescripcion}
+        <div class="precio">$${p.precio}</div>
         
-        <!-- Información de precio -->
-        <p class="mb-2">
-          <strong>Precio:</strong> 
-          $<span id="precio_${p.id_base}">${p.precio}</span>
-        </p>
+        ${p.descripcion ? `
+          <div class="descripcion">
+            <strong>Descripción:</strong><br>
+            ${p.descripcion}
+          </div>
+        ` : '<div class="descripcion text-muted">Sin descripción adicional</div>'}
         
-        <!-- Selector de talle (SOLO si hay talles) -->
         ${Object.keys(stockData).length > 0 && Object.keys(stockData)[0] !== "unico" ? `
-          <div class="mb-2">
-            <label class="form-label mb-1" style="font-size: 14px;"><strong>Talle:</strong></label>
-            <select id="talle_${p.id_base}" class="form-select form-select-sm w-auto d-inline-block"
-                    onchange="actualizarStockPorTalle('${p.id_base}', this.value)">
-              <option value="">Seleccionar talle...</option>
-              ${opcionesTalles}
-            </select>
+          <div class="mt-2">
+            <small><strong>Talles disponibles:</strong> ${Object.keys(stockData).join(", ")}</small>
           </div>
         ` : ""}
-         
-        ${configWhatsApp ? `<a href="${configWhatsApp}" class="btn btn-whatsapp">Contactar por WhatsApp</a>` : ""}
         
-        <div class="mt-2 d-flex flex-wrap align-items-center gap-2">
-          <label class="mb-0" style="font-size: 14px;">Cantidad:</label>
-          <input type="number" min="1" max="${stockInicial > 0 ? stockInicial : 1}" value="1"
-                 id="cantidad_${p.id_base}"
-                 class="form-control form-control-sm" style="width: 70px;"
-                 ${stockInicial <= 0 ? "disabled" : ""}>
-          
-          <button type="button" class="btn btn-secondary" id="btn_agregar_${p.id_base}"
-            onclick="${onclickAgregar}"
-            ${stockInicial <= 0 ? "disabled style='opacity:0.5'" : ""}>
-            ${stockInicial > 0 ? "Agregar al carrito" : "Sin stock"}
-          </button>
-        </div>
+        ${configWhatsApp ? `
+          <a href="${configWhatsApp}" class="btn-whatsapp mt-3">
+            💬 Consultar por WhatsApp
+          </a>
+        ` : ""}
         
-        <!-- 🔥 BOTONES DE ADMIN - SIMPLIFICADO A UN SOLO BOTÓN DE EDICIÓN -->
+        <!-- Botones admin en el reverso también -->
         ${window.modoAdmin ? `
-          <div class="mt-3 d-flex flex-wrap gap-2">
-            <!-- ÚNICO BOTÓN PARA EDITAR TODO EL PRODUCTO -->
+          <div class="mt-3 d-flex gap-2">
             <button type="button" class="btn btn-warning btn-sm"
               onclick="cargarProductoCompletoParaEditar('${p.id_base}')">
-              ✏️ Editar Producto
+              ✏️ Editar
             </button>
-            
-            <!-- Botón eliminar -->
             <button type="button" class="btn btn-danger btn-sm"
               onclick="eliminarProducto('${p.id_base}')">
-              🗑️ Eliminar
+              🗑️
             </button>
           </div>
         ` : ""}
       </div>
     </div>
-  `;
+  </div>
+`;
 
   // 🔥 Configurar talle inicial después de renderizar
   if (talleInicial) {
